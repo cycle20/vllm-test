@@ -5,6 +5,9 @@ sys     0m0.064s
 ```
 
 Chat completion results:
+
+```
+THINKING:
 Okay, I just read this research paper about TmAlphaFold database. It's focused on predicting the transmembrane alpha-helical proteins using AlphaFold2. I'm a bit new to this topic, so I need to break it down to understand what they did and why it's important.
 
 First, the abstract mentions that AlphaFold2 is a breakthrough in protein structure prediction. It's particularly good at predicting transmembrane proteins, which are proteins that span cell membranes. These proteins are crucial for many cellular functions, so accurately predicting their structures is important.
@@ -21,6 +24,7 @@ Another point is the comparison with Membraneome 3.0. The authors say their meth
 
 Overall, this seems like a significant advancement in predicting membrane proteins, which are often challenging due to their structural complexity. The database providing a high-quality resource should help researchers better understand these proteins and their functions.
 </think>
+```
 
 The TmAlphaFold database is a significant resource for researchers studying transmembrane alpha-helical proteins. Here's a structured summary of the key points from the research paper:
 

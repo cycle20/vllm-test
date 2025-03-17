@@ -10,6 +10,7 @@ vllm serve "Qwen/Qwen2.5-7B-Instruct-AWQ" --max-model-len 32768 --enforce-eager 
 ```
 
 Chat completion results:
+
 Based on the text, TmAlphaFold is a database aimed at membrane-localized proteins, specifically focusing on alpha-helical transmembrane proteins. It is based on the AlphaFold2 prediction method. Here are the key points:
 
 1. **AlphaFold2**: TmAlphaFold uses AlphaFold2 to predict the 3D structures of transmembrane proteins. AlphaFold2 is known for its highly accurate structure predictions.

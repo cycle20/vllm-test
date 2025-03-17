@@ -10,6 +10,7 @@ vllm command parameters: --max-model-len 32768 --enforce-eager
 
 
 Chat completion results:
+
 Based on the given text, **TmAlphaFold** is a database designed to aid in the study of transmembrane (TM) proteins, particularly those containing alpha-helical segments. It utilizes advanced computational methods to predict and visualize the membrane plane for these proteins, helping researchers to identify and analyze their spatial organization within cellular membranes.
 
 Key points about TmAlphaFold:
