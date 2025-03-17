@@ -1,6 +1,8 @@
+```
 more than 27min
+```
 
-
+```python
 Traceback (most recent call last):
   File "/usr/local/share/grad-app/venv/lib/python3.10/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
     yield
@@ -73,3 +75,4 @@ Traceback (most recent call last):
   File "/usr/local/share/grad-app/venv/lib/python3.10/site-packages/openai/_base_client.py", line 974, in _request
     raise APITimeoutError(request=request) from err
 openai.APITimeoutError: Request timed out.
+```

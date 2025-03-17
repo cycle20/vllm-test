@@ -1,9 +1,12 @@
+```
 real    2m21.866s
 user    0m3.950s
 sys     0m0.049s
+```
 
+```
 vllm command parameters: --max-model-len 32768 --enforce-eager
-
+```
 
 Chat completion results:
 Alright, so I'm trying to understand this TmAlphaFold database article. It's about a database of transmembrane protein structures, right? The name "TmAlphaFold" makes me think it's a modified version of the AlphaFold database, which I know is a big resource for protein structures. But here, they're focusing specifically on proteins that have transmembrane domains, like those with alpha-helices.

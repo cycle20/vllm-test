@@ -1,9 +1,12 @@
+```
 real    0m39.854s
 user    0m3.996s
 sys     0m0.068s
+```
 
+```
 vllm command parameters: --max-model-len 32768 --enforce-eager
-
+```
 
 
 Chat completion results:

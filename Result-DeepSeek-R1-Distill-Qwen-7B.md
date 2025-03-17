@@ -1,7 +1,8 @@
+```
 real    2m53.131s
 user    0m3.980s
 sys     0m0.064s
-
+```
 
 Chat completion results:
 Okay, I just read this research paper about TmAlphaFold database. It's focused on predicting the transmembrane alpha-helical proteins using AlphaFold2. I'm a bit new to this topic, so I need to break it down to understand what they did and why it's important.

@@ -1,9 +1,12 @@
+```
 real    0m10.109s
 user    0m3.962s
 sys     0m0.040s
+```
 
-vllm serve "$model" --max-model-len 32768 --enforce-eager --device cuda &> log.txt
-
+```
+vllm serve "Qwen/Qwen2.5-7B-Instruct-AWQ" --max-model-len 32768 --enforce-eager --device cuda
+```
 
 Chat completion results:
 Based on the text, TmAlphaFold is a database aimed at membrane-localized proteins, specifically focusing on alpha-helical transmembrane proteins. It is based on the AlphaFold2 prediction method. Here are the key points:

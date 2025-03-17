@@ -1,6 +1,8 @@
+```
 real    1m20.776s
 user    0m3.915s
 sys     0m0.089s
+```
 
 Chat completion results:
 Okay, so I'm trying to understand this TmAlphaFold database. From what I gather, it's a collection of proteins that have a transmembrane domain, meaning their proteins cross over from the membrane into the cytoplasm. These proteins are important because they're involved in many cellular processes, like immune responses and cell signaling.
