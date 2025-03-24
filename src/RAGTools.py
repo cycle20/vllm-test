@@ -63,16 +63,21 @@ class RAGTools:
             base_url = llmUrl,
         )
 
+        contextContent = ""
+        if len(context.strip()) > 0:
+            contextContent = f"\n\nContext:\n\n{context.strip()}"
+
         chat_completion = client.chat.completions.create(
             messages = [{
                 "role": "system",
                 "content": "You are a helpful assistant."
             }, {
                 "role": "user",
-                "content": f"Question: {question}\n\nYour answer should be brief.\n\nContext:\n\n{context}"
+                "content": f"Question: {question.strip()} Your answer should be brief.{contextContent}"
             }],
             model = llmModel,
         )
 
         # TODO: What if we have more choices?
+        print(f"\n\n# OF CHOICES: {len(chat_completion.choices)}\n\n")
         return chat_completion.choices[0].message.content
