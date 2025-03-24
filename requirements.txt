@@ -6,5 +6,7 @@ pymupdf4llm
 chromadb
 langchain-openai
 langchain-community
+langchain_experimental
 faiss-cpu
+sentence-transformers
 
