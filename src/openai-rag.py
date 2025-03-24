@@ -6,16 +6,9 @@
 # (venv-vllm-cuda) quad-6:~$ vllm serve "$model" --gpu-memory-utilization 0.9 --max-model-len 9000  &> vllm_source/log.txt &
 #
 import argparse
-import pymupdf4llm
-import faiss
-import numpy
 import sys
 import RAGTools
-from openai import OpenAI
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyMuPDFLoader
-from langchain_community.vectorstores import FAISS
-from sentence_transformers import SentenceTransformer
 
 llmDefaultModel = r'neuralmagic/DeepSeek-R1-Distill-Llama-70B-quantized.w4a16'
 llmBaseUrl = r'http://localhost:8000/v1'
@@ -45,10 +38,10 @@ parser.add_argument('--embedding-model',
 # Parse the arguments
 args = parser.parse_args()
 
-tools = RAGTools.RAGTools()
 loader = PyMuPDFLoader(file_path='gkac928.pdf')
 data = loader.load()
 
+tools = RAGTools.RAGTools()
 texts = []
 for doc in tools.split(data):
     texts.append(doc.page_content)
@@ -61,7 +54,7 @@ hits = tools.searchRelevant(question)
 openai_api_key = "EMPTY"
 
 context = "\n\n==========================\n\n".join([doc.page_content for doc in hits])
-print([context, question, args.llm_url, args.llm_model, openai_api_key])
+print(f'\n\nQUESTION: {question}\n\nCONTEXT:\n\n{context}')
 answer = tools.sendQueryToOpenAI(context, question, llmModel = args.llm_model, apiKey = openai_api_key)
 
 print(f'\n\nANSWER:\n\n{answer}')
