@@ -1,17 +1,4 @@
 #
-# server side:
-#
-# $ echo $model
-# neuralmagic/DeepSeek-R1-Distill-Llama-70B-quantized.w4a16
-# (venv-vllm-cuda) quad-6:~$ vllm serve "$model" --gpu-memory-utilization 0.9 --max-model-len 9000  &> vllm_source/log.txt &
-#
-# OR for embedding:
-#
-# (venv-vllm-cuda) quad-6:~$ vllm serve "$model" --task embed --gpu-memory-utilization 0.9 --max-model-len 9000  &> vllm.log &
-#
-#
-#
-#
 #
 # NOTE: embedding does not working through OpenAI API calls:
 # through API calls: similar errors: Token id 98588 is out of vocabulary.
@@ -32,20 +19,12 @@ import pymupdf4llm
 import faiss
 import sys
 from langchain_openai import OpenAIEmbeddings
-from langchain_experimental.text_splitter import SemanticChunker
-from langchain_text_splitters import CharacterTextSplitter
-from langchain_text_splitters import MarkdownHeaderTextSplitter
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.docstore.in_memory import InMemoryDocstore
-from langchain_community.document_loaders import PyMuPDFLoader
-from langchain_community.vectorstores import FAISS
-from langchain_core.vectorstores import InMemoryVectorStore
 
 llmDefaultModel = 'neuralmagic/DeepSeek-R1-Distill-Llama-70B-quantized.w4a16'
 llmBaseUrl = 'http://localhost:8000/v1'
 
 embeddingModel = 'sentence-transformers/all-MiniLM-L6-v2'
-# embeddingUrl = 'http://localhost:8001/v1'
+embeddingUrl = 'http://localhost:8001/v1'
 
 question = 'What is TmAlphaFold?'
 
@@ -75,27 +54,6 @@ parser.add_argument('--embedding-model',
 # Parse the arguments
 args = parser.parse_args()
 
-# md_text = pymupdf4llm.to_markdown(args.pdf_file)
-# md_text = md_text[:3900]
-fileName = 'Result-Intermediate-Text-Extraction-From-PDF.md'
-with open(fileName, 'r', encoding='utf-8') as file:
-    # sentences = [ file.read() ]
-    md_text = file.read()
-
-#loader = PyMuPDFLoader(file_path='gkac928.pdf')
-
-from sentence_transformers import SentenceTransformer
-sentences = ["This is an example sentence", "Each sentence is converted"]
-sentences = [ "TmAlphaFold database: membrane localization and evaluation of AlphaFold2 predicted alpha-helical transmembrane protein structures" ]
-sentences = [ "What is TmAlphaFold?" ]
-
-model = SentenceTransformer(embeddingModel)
-embeddings = model.encode(sentences)
-print(embeddings)
-print(sentences)
-sys.exit()
-
-
 # Set OpenAI's API key and API base to use vLLM's API server.
 openai_api_key = "EMPTY"
 embedding_api_base = args.embedding_url
@@ -111,124 +69,44 @@ embeddings = OpenAIEmbeddings(
     show_progress_bar=True
 )
 
-# Chunks
-
-def markDownChunker(markdown_document):
-    headers_to_split_on = [
-        ("#", "Header 1"),
-        ("##", "Header 2"),
-        ("###", "Header 3"),
-    ]
-
-    markdown_splitter = MarkdownHeaderTextSplitter(
-        headers_to_split_on = headers_to_split_on,
-        strip_headers = False
-    )
-    md_header_splits = markdown_splitter.split_text(markdown_document)
-
-    chunk_size = 250
-    chunk_overlap = 30
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=chunk_size, chunk_overlap=chunk_overlap
-    )
-
-    # Split
-    # splits = text_splitter.split_documents([markdown_document])
-    splits = text_splitter.split_text(markdown_document)
-
-    return splits
-
-def semanticChunker(embeddings, docs):
-    text_splitter = SemanticChunker(embeddings)
-    docs = text_splitter.create_documents(docs)
-    return docs
-
-
 print(len(embeddings.embed_query('What is TmAlphaFol?')))
-sys.exit()
+print(len(embeddings.embed_query('What is TmAlphaFold?')))
 
-#print(semanticChunker(embeddings, markDownChunker(md_text)))
-data = loader.load()
-text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=256, chunk_overlap=20
-)
-chunks = text_splitter.split_documents(data)
-for chunk in chunks:
-    chunk.metadata.clear()
-    print(embeddings.embed_query(chunk.page_content))
-    print('=====================================')
+# Client side log:
 
-sys.exit()
-
-
-
-# result = embeddings.embed_query(md_text)
-# print(len(result))
-# print(result)
-
-###########################################################xx
-
-vectorstore = InMemoryVectorStore.from_texts(
-    [md_text],
-    embedding=embeddings,
-)
-
-# Use the vectorstore as a retriever
-retriever = vectorstore.as_retriever()
-
-# Retrieve the most similar text
-retrieved_documents = retriever.invoke(question)
-
-# show the retrieved document's content
-print(retrieved_documents)
-print(retrieved_documents[0].page_content)
-
-sys.exit()
+# (venv) c@dev.ei:/bigdisk/users/csongor/rag$ python src/openai-embedding.py
+# 100%|██████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 23.82it/s]
+# 384
+#   0%|                                                                                                      | 0/1 [00:00<?, ?it/s]
+# Traceback (most recent call last):
+#   File "/bigdisk/users/csongor/rag/src/openai-embedding.py", line 75, in <module>
+#     print(len(embeddings.embed_query('What is TmAlphaFold?')))
+#   File "/usr/local/share/grad-app/venv/lib/python3.10/site-packages/langchain_openai/embeddings/base.py", line 629, in embed_query
+#     return self.embed_documents([text])[0]
+#   File "/usr/local/share/grad-app/venv/lib/python3.10/site-packages/langchain_openai/embeddings/base.py", line 588, in embed_documents
+#     return self._get_len_safe_embeddings(texts, engine=engine)
+#   File "/usr/local/share/grad-app/venv/lib/python3.10/site-packages/langchain_openai/embeddings/base.py", line 483, in _get_len_safe_embeddings
+#     response = self.client.create(
+#   File "/usr/local/share/grad-app/venv/lib/python3.10/site-packages/openai/resources/embeddings.py", line 128, in create
+#     return self._post(
+#   File "/usr/local/share/grad-app/venv/lib/python3.10/site-packages/openai/_base_client.py", line 1242, in post
+#     return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+#   File "/usr/local/share/grad-app/venv/lib/python3.10/site-packages/openai/_base_client.py", line 919, in request
+#     return self._request(
+#   File "/usr/local/share/grad-app/venv/lib/python3.10/site-packages/openai/_base_client.py", line 1023, in _request
+#     raise self._make_status_error_from_response(err.response) from None
+# openai.BadRequestError: Error code: 400 - {'object': 'error', 'message': 'Token id 76636 is out of vocabulary', 'type': 'BadRequestError', 'param': None, 'code': 400}
 
 
-###########################################################xx
-
-# print("Calling embed_query...")
-# result = embeddings.embed_query(md_text)
-# 
-# print(embeddings)
-# print("Vector -----------------")
-# print(result)
-
-#print("Storing into FAISS db...")
 
 
-# index = faiss.IndexFlatL2(len(embeddings.embed_query(md_text)))
-# 
-# vector_store = FAISS(
-#     embedding_function=embeddings,
-#     index=index,
-#     docstore=InMemoryDocstore(),
-#     index_to_docstore_id={},
-# )
-# 
-# vector_store.save_local("faiss_index")
+# Server side log:
 
-
-###########################################################xx
-
-
-# Create an OpenAI client to interact with the API server
-client = OpenAI(
-    api_key=openai_api_key,
-    base_url=llm_api_base,
-)
-
-chat_completion = client.chat.completions.create(
-    messages=[{
-        "role": "system",
-        "content": "You are a helpful assistant."
-    }, {
-        "role": "user",
-        "content": f"Question: What is TmAlphaFold based on this text?\n\nContext: {md_text}"
-    }],
-    model=llm_model,
-)
-
-print("Chat completion results:")
-print(chat_completion.choices[0].message.content)
+# INFO 03-24 09:11:27 logger.py:39] Received request embd-04a2f7dc15d343539b3d5a87401dd575-0: prompt: 'urban [unused369] [unused345] [unused75] bolts [unused36] [unused332] [unused29]', params: PoolingParams(additional_metadata=None), prompt_token_ids: [3923, 374, 350, 76, 19947, 37, 337, 30], lora_request: None, prompt_adapter_request: None.
+# INFO 03-24 09:11:27 engine.py:280] Added request embd-04a2f7dc15d343539b3d5a87401dd575-0.
+# INFO 03-24 09:11:27 metrics.py:455] Avg prompt throughput: 1.0 tokens/s, Avg generation throughput: 0.1 tokens/s, Running: 0 reqs, Swapped: 0 reqs, Pending: 0 reqs, GPU KV cache usage: 0.0%, CPU KV cache usage: 0.0%.
+# INFO:     127.0.0.1:42580 - "POST /v1/embeddings HTTP/1.1" 200 OK
+# INFO 03-24 09:11:27 logger.py:39] Received request embd-9e18e1c6f7474999992758effbd62ae8-0: prompt: 'urban [unused369] [unused345] [unused75] bolts [unused29]', params: PoolingParams(additional_metadata=None), prompt_token_ids: [3923, 374, 350, 76, 19947, 76636, 30], lora_request: None, prompt_adapter_request: None.
+# INFO:     127.0.0.1:42580 - "POST /v1/embeddings HTTP/1.1" 400 Bad Request
+# INFO 03-24 09:11:27 engine.py:298] Aborted request embd-9e18e1c6f7474999992758effbd62ae8-0.
+# INFO 03-24 09:11:37 metrics.py:455] Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 0.0 tokens/s, Running: 0 reqs, Swapped: 0 reqs, Pending: 0 reqs, GPU KV cache usage: 0.0%, CPU KV cache usage: 0.0%.
