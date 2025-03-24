@@ -44,11 +44,6 @@ parser.add_argument('--embedding-model',
 # Parse the arguments
 args = parser.parse_args()
 
-# fileName = 'Result-Intermediate-Text-Extraction-From-PDF.md'
-# with open(fileName, 'r', encoding='utf-8') as file:
-#     # sentences = [ file.read() ]
-#     md_text = file.read()
-
 embeddingModel = args.embedding_model
 
 loader = PyMuPDFLoader(file_path='gkac928.pdf')
@@ -57,16 +52,9 @@ text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=1000, chunk_overlap=250
 )
 
-# for doc in data:
-#     print(doc.page_content)
-# print("===================== END OF DOCUMENT ===========================================")
-
 chunks = text_splitter.split_documents(data)
 
-# sentences = [ "What is TmAlphaFold?" ]
-
 model = SentenceTransformer(embeddingModel)
-# embeddings = model.encode_multi_process(chunks, ...
 embeddings = []
 texts = []
 for doc in chunks:
@@ -74,14 +62,7 @@ for doc in chunks:
 
 embeddings = model.encode(texts)
 
-# for index in range(0, len(embeddings)):
-#     print("\nEMBEDDIGNS: " + len(embeddings[index]).__str__() + "\n")
-#     print(chunks[index].page_content + "\n")
-#     print("===================================================")
-
-# sys.exit()
-
-###########################################################xx
+###########################################################
 
 dimension = embeddings.shape[1]
 index = faiss.IndexFlatL2(dimension)
@@ -99,7 +80,7 @@ for i in indices[0]:
     print(texts[i])
     print('============================================')
 
-###########################################################xx
+###########################################################
 
 
 # Set OpenAI's API key and API base to use vLLM's API server.
