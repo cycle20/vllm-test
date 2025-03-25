@@ -8,6 +8,7 @@
 import faiss
 import numpy
 import sys
+import datetime
 from openai import OpenAI
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_text_splitters.base import TextSplitter
@@ -16,6 +17,10 @@ from sentence_transformers import SentenceTransformer
 
 llmBaseUrl = r'http://localhost:8000/v1'
 llmDefaultModel = r'neuralmagic/DeepSeek-R1-Distill-Llama-70B-quantized.w4a16'
+
+def log(message: str):
+    message = f"{datetime.datetime.now()}: {message}"
+    print(message)
 
 class RAGTools:
 
@@ -43,8 +48,8 @@ class RAGTools:
         qEmbedding = self.sentenceTransformer.encode(question)
 
         distances, indices = self.index.search(numpy.array([ qEmbedding ]), k = maxHitNumber)
-        print(f"Indicies of closest texts: {indices}")
-        print(f"Distances: {distances}")
+        log(f"Indicies of closest texts: {indices}")
+        log(f"Distances: {distances}")
 
         searchResults = []
         for i in indices[0]:
@@ -65,19 +70,24 @@ class RAGTools:
 
         contextContent = ""
         if len(context.strip()) > 0:
-            contextContent = f"\n\nContext:\n\n{context.strip()}"
+            contextContent = f"\n\nCONTEXT (or related document content):\n\n'{context.strip()}'"
 
+        messageToLLM = f"QUESTION: \n'{question.strip()}'\nYour answer should be brief, maximum 3 sentences.{contextContent}"
+        log(f"Message to LLM:\n{messageToLLM}")
         chat_completion = client.chat.completions.create(
             messages = [{
                 "role": "system",
                 "content": "You are a helpful assistant."
             }, {
                 "role": "user",
-                "content": f"Question: {question.strip()} Your answer should be brief.{contextContent}"
+                "content": messageToLLM
             }],
             model = llmModel,
         )
 
         # TODO: What if we have more choices?
-        print(f"\n\n# OF CHOICES: {len(chat_completion.choices)}\n\n")
+        log(f"# OF CHOICES: {len(chat_completion.choices)}")
+        response = chat_completion.choices[0].message.content
+        log(f"Answer '{response}'")
+
         return chat_completion.choices[0].message.content

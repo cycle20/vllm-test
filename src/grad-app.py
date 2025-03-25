@@ -2,7 +2,7 @@ import argparse
 import gradio as gr
 import re
 import sys
-import RAGTools
+import RAGTools as rag
 from langchain_community.document_loaders import PyMuPDFLoader
 
 openai_api_key = "EMPTY"
@@ -31,7 +31,7 @@ parser.add_argument('--embedding-model',
 args = parser.parse_args()
 
 
-def process_pdf(pdf_bytes, tools: RAGTools.RAGTools):
+def process_pdf(pdf_bytes, tools: rag.RAGTools):
     if pdf_bytes is None:
         return None, None, None
 
@@ -48,7 +48,9 @@ def ask_question(pdf_bytes, question):
     global openai_api_key
     global args
 
-    tools = RAGTools.RAGTools()
+    rag.log("========== REQUEST RECEIVED ====================")
+
+    tools = rag.RAGTools()
 
     context = ""
     if pdf_bytes != None:
@@ -56,12 +58,17 @@ def ask_question(pdf_bytes, question):
         embeddings = tools.embed(chunks)
         tools.createIndex(embeddings)
         hits = tools.searchRelevant(question)
-        context = "\n\n==========================\n\n".join([doc.page_content for doc in hits])
+        if (len(hits) > 0):
+            context = "\n\n------\n\n".join([doc.page_content for doc in hits])
+        else:
+            rag.log("WARNING: No relevant chunks found")
 
-    answer = tools.sendQueryToOpenAI(context, question, llmModel = args.llm_model, apiKey = openai_api_key)
+    answer = tools.sendQueryToOpenAI(question, context, llmModel = args.llm_model, apiKey = openai_api_key)
     answer = re.sub(r".*?</think>", "", answer, flags = re.DOTALL).strip()
 
-    print(f"ANSWER: {answer}")
+    rag.log(f"ANSWER:\n'{answer}'\n")
+
+    rag.log("========== SENDING RESPONSE TO FRONTEND ====================")
 
     return answer
 

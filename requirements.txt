@@ -1,9 +1,7 @@
 gradio
 langchain-community
 langchain
-ollama
 pymupdf4llm
-chromadb
 langchain-openai
 langchain-community
 langchain_experimental
